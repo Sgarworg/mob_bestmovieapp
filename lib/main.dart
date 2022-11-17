@@ -101,7 +101,7 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: const Text('Item 2'),
+                    title: const Text('Item 1'),
                     onTap: () {
                       // Update the state of the app
                       // ...
