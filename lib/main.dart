@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
                 children: [
                   const DrawerHeader(
                     decoration: BoxDecoration(
-                      color: Colors.black38,
+                      color: Colors.redAccent,
                     ),
                     child: Text('Hier kommen sachen hin'),
                   ),
