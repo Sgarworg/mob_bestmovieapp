@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "792402958930",
+    "project_id": "mob-thewatcher3",
+    "storage_bucket": "mob-thewatcher3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792402958930:android:9d858bbb3af3fbc87e1d8b",
+        "android_client_info": {
+          "package_name": "com.example.mob_bestmovieapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792402958930-iavr48tlj8b707odh2m0tcntqgjo0490.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVQ8cva5o4xhKeb0-whx-WfleGehYKfFg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792402958930-iavr48tlj8b707odh2m0tcntqgjo0490.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

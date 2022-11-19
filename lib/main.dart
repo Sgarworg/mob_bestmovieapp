@@ -5,8 +5,16 @@ import 'widgets/trending.dart';
 import 'widgets/toprated.dart';
 import 'widgets/tvToprated.dart';
 import 'package:mob_bestmovieapp/widgets/secret.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() => runApp(new MyApp());
+Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.android,
+  );
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -87,7 +95,7 @@ class _HomeState extends State<Home> {
                 children: [
                   const DrawerHeader(
                     decoration: BoxDecoration(
-                      color: Colors.redAccent,
+                      color: Color.fromRGBO(217, 35, 22, 90),
                     ),
                     child: Text('Hier kommen sachen hin'),
                   ),
