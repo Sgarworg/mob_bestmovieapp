@@ -7,6 +7,11 @@ import 'widgets/tvToprated.dart';
 import 'package:mob_bestmovieapp/widgets/secret.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'widget_tree.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mob_bestmovieapp/auth_fb.dart';
+
+
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,19 +25,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Home(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(brightness: Brightness.dark, primaryColor: Colors.black),
+      home: const WidgetTree(),
     );
   }
 }
 
 class Home extends StatefulWidget {
+
+
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  final User? user = AuthFb().currentUser;
+  Future<void> signOut() async {
+    await AuthFb().signOut();
+  }
   List topratedmovies = [];
   List genreIds = [];
   List topratedTv = [];
@@ -97,19 +108,17 @@ class _HomeState extends State<Home> {
                     decoration: BoxDecoration(
                       color: Color.fromRGBO(217, 35, 22, 90),
                     ),
-                    child: Text('Hier kommen sachen hin'),
+                    child: modified_text(text: 'Burger Menü'),
                   ),
                   ListTile(
-                    title: modified_text(text: 'test'),
+                    title: modified_text(text: 'Logout'),
                     onTap: () {
-                      // Update the state of the app
-                      // ...
-                      // Then close the drawer
+                      signOut();
                       Navigator.pop(context);
                     },
                   ),
                   ListTile(
-                    title: const Text('Item 1'),
+                    title: const Text('Platzhalter'),
                     onTap: () {
                       // Update the state of the app
                       // ...
