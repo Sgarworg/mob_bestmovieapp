@@ -33,6 +33,7 @@ dependencies:
     sdk: flutter
   tmdb_api:
   google_fonts:
+  eva_icons_flutter:
 
 
 

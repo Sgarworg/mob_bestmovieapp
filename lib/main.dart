@@ -8,6 +8,8 @@ import 'package:mob_bestmovieapp/widgets/secret.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -76,6 +78,7 @@ class _HomeState extends State<Home> {
             appBar: AppBar(
               //backgroundColor: Colors.transparent,
               title: modified_text(text: 'The Watcher 3',size: 30,),
+              actions: <Widget>[IconButton(onPressed: null, icon: Icon(EvaIcons.searchOutline))],
             ),
             body: ListView(
               children: [
