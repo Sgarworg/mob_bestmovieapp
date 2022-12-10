@@ -1,5 +1,4 @@
 import 'package:mob_bestmovieapp/auth_fb.dart';
-import 'package:mob_bestmovieapp/pages/home_page.dart';
 import 'package:mob_bestmovieapp/pages/login_register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:mob_bestmovieapp/main.dart';
