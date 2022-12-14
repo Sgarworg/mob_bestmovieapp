@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../auth_fb.dart';
+import 'package:mob_bestmovieapp/utils/text.dart';
+import 'package:mob_bestmovieapp/widgets/database.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -43,13 +45,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('The Watcher 3 Login');
+    return const modified_text(
+      text: 'The Watcher 3 Login',
+      size: 25,
+    );
   }
 
   Widget _entryField(
-      String title,
-      TextEditingController controller,
-      ) {
+    String title,
+    TextEditingController controller,
+  ) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -65,8 +70,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget _submitButton() {
     return ElevatedButton(
       onPressed:
-      isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
-      child: Text(isLogin ? 'Login' : 'Register'),
+          isLogin ? signInWithEmailAndPassword : createUserWithEmailAndPassword,
+      child: modified_text(
+        text: (isLogin ? 'Login' : 'Register'),
+        color: Colors.white,
+      ),
+      style: ElevatedButton.styleFrom(primary: Colors.white12),
     );
   }
 
@@ -86,6 +95,19 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: _title(),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF272626),
+                  const Color(0xFFC90909),
+                ],
+                begin: const FractionalOffset(0.0, 0.0),
+                end: const FractionalOffset(0.0, 3.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp),
+          ),
+        ),
       ),
       body: Container(
         height: double.infinity,
@@ -95,8 +117,8 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _entryField('email', _controllerEmail),
-            _entryField('password', _controllerPassword),
+            _entryField('Email', _controllerEmail),
+            _entryField('Password', _controllerPassword),
             _errorMessage(),
             _submitButton(),
             _loginOrRegisterButton(),

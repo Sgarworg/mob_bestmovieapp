@@ -1,19 +1,19 @@
-import 'dart:js';
-
 import 'package:flutter/material.dart';
 import 'package:tmdb_api/tmdb_api.dart';
 import 'utils/text.dart';
-import 'widgets/trending.dart';
-import 'widgets/toprated.dart';
-import 'widgets/tvToprated.dart';
+
 import 'package:mob_bestmovieapp/widgets/secret.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'widget_tree.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mob_bestmovieapp/auth_fb.dart';
-
+import 'widgets/database.dart';
+import 'package:mob_bestmovieapp/widgets/details.dart';
+import 'widgets/savedMovies.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:mob_bestmovieapp/pages/mediaSearch.dart';
+import 'package:mob_bestmovieapp/widgets/visualMedia.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,15 +21,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.android,
   );
   runApp(MyApp());
-}
-
-TMDB apiCall() {
-  final String apikey = '6c1cc2ae77b7b9cd5fc2490f81c2b2c1';
-  final readaccesstoken =
-      'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YzFjYzJhZTc3YjdiOWNkNWZjMjQ5MGY4MWMyYjJjMSIsInN1YiI6IjYzMzU5NzE2YmJkMGIwMDA5MTBiZTQ4YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9qdaldxu0APypgbdu5IYZGPZsijw2_4QrDZ3wW0ktUM';
-  return TMDB(ApiKeys(apikey, readaccesstoken),
-      defaultLanguage: 'de-EU',
-      logConfig: ConfigLogger(showLogs: true, showErrorLogs: true));
 }
 
 class MyApp extends StatelessWidget {
@@ -43,6 +34,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
+TMDB apiCall() {
+  final String apikey = '6c1cc2ae77b7b9cd5fc2490f81c2b2c1';
+  final readaccesstoken =
+      'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YzFjYzJhZTc3YjdiOWNkNWZjMjQ5MGY4MWMyYjJjMSIsInN1YiI6IjYzMzU5NzE2YmJkMGIwMDA5MTBiZTQ4YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9qdaldxu0APypgbdu5IYZGPZsijw2_4QrDZ3wW0ktUM';
+  return TMDB(ApiKeys(apikey, readaccesstoken),
+      defaultLanguage: 'de-EU',
+      logConfig: ConfigLogger(showLogs: true, showErrorLogs: true));
+}
+
+getResult(String toFind) async {
+  var search = {};
+  var movies = await apiCall().v3.search.queryMovies(toFind);
+  search['movies'] = movies['results'];
+  var series = await apiCall().v3.search.queryTvShows(toFind);
+  search['series'] = series['results'];
+  return search;
+}
+
 class Home extends StatefulWidget {
   @override
   State<Home> createState() => _HomeState();
@@ -50,37 +59,34 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final User? user = AuthFb().currentUser;
+
   Future<void> signOut() async {
     await AuthFb().signOut();
   }
 
   List topratedmovies = [];
-  List genreIds = [];
+  List trending = [];
+  List popular = [];
+  List popularTv = [];
   List topratedTv = [];
 
-  // List trendingseries = [];
-  List tv = [];
-  final String apikey = '6c1cc2ae77b7b9cd5fc2490f81c2b2c1';
-  final readaccesstoken =
-      'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2YzFjYzJhZTc3YjdiOWNkNWZjMjQ5MGY4MWMyYjJjMSIsInN1YiI6IjYzMzU5NzE2YmJkMGIwMDA5MTBiZTQ4YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9qdaldxu0APypgbdu5IYZGPZsijw2_4QrDZ3wW0ktUM';
-
   Future<List> loadmovie() async {
-    TMDB tmdbWithCustomLogs = apiCall();
-
     Map trendingresult = await apiCall().v3.trending.getTrending();
     Map topratedresult = await apiCall().v3.movies.getTopRated();
-    Map genreIdsresult = await apiCall().v3.genres.getMovieList();
-    Map topratedTvresult = await apiCall().v3.tv.getTopRated();
+    Map popularResult = await apiCall().v3.movies.getPopular();
 
-    // Map tvresult = await tmdbWithCustomLogs.v3.tv.getTopRated();
+    Map topratedTvresult = await apiCall().v3.tv.getTopRated();
+    Map popularTvResult = await apiCall().v3.tv.getPopular();
+
+
     topratedTv = topratedTvresult['results'];
     topratedmovies = topratedresult['results'];
-    genreIds = genreIdsresult['genres'];
+    trending = trendingresult['results'];
+    popular = popularResult['results'];
+    popularTv = popularTvResult['results'];
 
-    print(topratedTv);
+
     return trendingresult['results'];
-
-    // tv = tvresult['result'];
   }
 
   Widget build(BuildContext context) {
@@ -89,8 +95,21 @@ class _HomeState extends State<Home> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
-            backgroundColor: Colors.black54,
+            backgroundColor: Colors.black87,
             appBar: AppBar(
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF272626),
+                        const Color(0xFFC90909),
+                      ],
+                      begin: const FractionalOffset(0.0, 0.0),
+                      end: const FractionalOffset(0.0, 3.0),
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.clamp),
+                ),
+              ),
               //backgroundColor: Colors.transparent,
               title: modified_text(
                 text: 'The Watcher 3',
@@ -106,26 +125,65 @@ class _HomeState extends State<Home> {
                     icon: Icon(EvaIcons.searchOutline))
               ],
             ),
-            body: ListView(
-              children: [
-                TrendingMovies(trending: snapshot.data!),
-                TopRatedMovies(toprated: topratedmovies),
-                TopRatedTv(toprated: topratedTv),
-              ],
-            ),
+            body: ListView(children: [
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Details(movies: trending[7])));
+                },
+                child: Container(
+                  height: 350,
+                  child: Stack(
+                    children: [
+                      Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(12),
+                                  bottomRight: Radius.circular(12)),
+                              image: DecorationImage(
+                                  fit: BoxFit.fitWidth,
+                                  alignment: FractionalOffset.topCenter,
+                                  image: NetworkImage(
+                                      'https://image.tmdb.org/t/p/w500' +
+                                          trending[7]['poster_path'])))),
+                    ],
+                  ),
+                ),
+              ),
+
+              VisualMedia(visualmedia: snapshot.data!, string: 'Trending Movies',),
+              VisualMedia(visualmedia: popular, string: 'Popular Movies',),
+              VisualMedia(visualmedia: topratedmovies,string: 'Top Rated Movies',),
+
+              VisualMedia(visualmedia: topratedTv, string: 'Top Rated TV Series',),
+              VisualMedia(visualmedia: popularTv, string: 'Popular TV Series',),
+
+
+            ]),
             drawer: Drawer(
-              // Add a ListView to the drawer. This ensures the user can scroll
-              // through the options in the drawer if there isn't enough vertical
-              // space to fit everything.
+              width: 200,
               child: ListView(
-                // Important: Remove any padding from the ListView.
+                //Remove any padding from the ListView.
                 padding: EdgeInsets.zero,
                 children: [
-                  const DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(217, 35, 22, 90),
+                  const SizedBox(
+                    height: 60,
+                    child: DrawerHeader(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFF272626),
+                              const Color(0xFFC90909),
+                            ],
+                            begin: const FractionalOffset(0.0, 0.0),
+                            end: const FractionalOffset(0.0, 2.0),
+                            stops: [0.0, 1.0],
+                            tileMode: TileMode.clamp),
+                      ),
+                      child: modified_text(text: 'Burger Menü'),
                     ),
-                    child: modified_text(text: 'Burger Menü'),
                   ),
                   ListTile(
                     title: modified_text(text: 'Logout'),
@@ -135,12 +193,10 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: const Text('Platzhalter'),
+                    title: const Text('Watcher 3 List'),
                     onTap: () {
-                      // Update the state of the app
-                      // ...
-                      // Then close the drawer
-                      Navigator.pop(context);
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => SavedMovies()));
                     },
                   ),
                 ],
@@ -155,128 +211,4 @@ class _HomeState extends State<Home> {
       },
     );
   }
-}
-
-class MediaSearch extends SearchDelegate<String> {
-  final media = <String>[];
-  final recentMedia = ["Bu", "Jo"];
-
-  @override
-  List<Widget> buildActions(BuildContext context) => [
-        IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            query = '';
-            showSuggestions(context);
-          },
-        )
-      ];
-
-  @override
-  Widget buildLeading(BuildContext context) => IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () => close(context, "okay"),
-      );
-
-  //@override
-  //Widget buildResults(BuildContext context) => Center(
-  //child: Column(
-  //mainAxisAlignment:MainAxisAlignment.center,
-  //children: [
-  //Icon(Icons.location_city, size: 120),
-  //const SizedBox(height: 48),
-  //Text(
-  //query,
-  //style: TextStyle(
-  //color: Colors.black45,
-  //fontSize: 64,
-  //fontWeight: FontWeight.bold,
-  //),
-  //)
-  //],
-  //),
-  //);
-
-  @override
-  Widget buildResults(BuildContext context) => FutureBuilder<Map>(
-      future: apiCall().v3.search.queryMovies("John Wick 4"),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator());
-          default:
-            if (snapshot.hasError) {
-              return Container(
-                color: Colors.black45,
-                alignment: Alignment.center,
-                child: Text(
-                  "Something went wrong",
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            } else {
-              return buildResultsSuccess(snapshot.data!);
-            }
-        }
-      });
-
-  //@override
-  //Widget buildSuggestions(BuildContext context) {
-  //  final suggestions = query.isEmpty
-  //    ? recentMedia : media.where((med) {
-  //      final mediaLower = med.toLowerCase();
-  //      final queryLower = query.toLowerCase();
-  //      return mediaLower.startsWith(queryLower);
-  //  }).toList();
-  //  return buildSuggestionsSuccess(suggestions);
-  //}
-
-  @override
-  Widget buildSuggestions(BuildContext context) => Container(
-        color: Colors.black45,
-        child: FutureBuilder<Map>(
-          future: apiCall().v3.search.queryMovies("Jo"),
-          builder: (context, snapshot) {
-            if (query.isEmpty) return buildNoSuggestions();
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
-              default:
-                if (snapshot.hasError || snapshot.data!.isEmpty) {
-                  return buildNoSuggestions();
-                } else {
-                  return buildSuggestionsSuccess(snapshot.data!);
-                }
-            }
-          },
-        ),
-      );
-
-  Widget buildSuggestionsSuccess(Map<dynamic, dynamic> suggestions) =>
-      ListView.builder(
-        itemCount: suggestions.length,
-        itemBuilder: (context, index) {
-          final suggestion = suggestions[index];
-
-          return ListTile(
-            onTap: () {
-              query = suggestion;
-              showResults(context);
-              //MaterialPageRoute(
-              //  builder: (BuildContext context) => details(suggestion),
-              //),
-            },
-            leading: Icon(Icons.play_arrow_outlined),
-            title: Text(suggestion),
-          );
-        },
-      );
-
-  Widget buildNoSuggestions() => Center(
-        child: Text("Nothing", style: TextStyle(color: Colors.white)),
-      );
-  Widget buildResultsSuccess(Map media) => ListView(
-    
-      //TrendingMovies(trending: media);
-  );
 }

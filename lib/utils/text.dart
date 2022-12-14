@@ -16,6 +16,7 @@ class modified_text extends StatelessWidget {
       color: color,
       fontSize: size
     ),
+
     );
   }
 }

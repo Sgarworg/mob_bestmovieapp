@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tmdb_api/tmdb_api.dart';
 import 'package:mob_bestmovieapp/utils/text.dart';
-import 'package:mob_bestmovieapp/widgets/trending.dart';
+
 
 class Secret extends StatelessWidget {
   const Secret({Key? key}) : super(key: key);
